@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import { extractText } from '../services/extractor.js';
 import { generateStudyMaterial } from '../services/ai.js';
@@ -11,19 +12,6 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
-// Configure multer for file uploads
-const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e6)}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
-});
 
 const ALLOWED_TYPES = [
   'application/pdf',
@@ -34,7 +22,7 @@ const ALLOWED_TYPES = [
 const ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.pptx'];
 
 const upload = multer({
-  storage,
+  dest: os.tmpdir(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();

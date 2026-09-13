@@ -28,9 +28,13 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`\n  🚀 StudyFlow server running on http://localhost:${PORT}\n`);
-  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
-    console.log('  ⚠️  Warning: GEMINI_API_KEY is not set in server/.env\n');
-  }
-});
+if (process.env.NODE_ENV !== 'production' && !process.env.NETLIFY) {
+  app.listen(PORT, () => {
+    console.log(`\n  🚀 StudyFlow server running on http://localhost:${PORT}\n`);
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+      console.log('  ⚠️  Warning: GEMINI_API_KEY is not set in server/.env\n');
+    }
+  });
+}
+
+export default app;
